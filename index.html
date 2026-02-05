@@ -630,14 +630,23 @@
         }
 
         // FIXED: This now loads the search into the SURF window instead of leaving GBA OS
-        function handleEnter(e) { 
-            if(e.key==='Enter') {
-                let val = e.target.value;
-                let url = val.startsWith('http') ? val : "https://www.bing.com/search?q=" + encodeURIComponent(val);
-                openExternal(url);
-                e.target.value = ""; // Clear main search bar after use
-            }
+        function handleEnter(e) {
+    if (e.key === 'Enter') {
+        let val = e.target.value;
+        let url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://www.bing.com/search?q=' + encodeURIComponent(val);
+        
+        // If the URL is Mixamo or Google, warn the user it might block the iframe
+        if (url.includes("mixamo.com") || url.includes("google.com")) {
+            console.log("This site usually blocks iframes. Opening in Standalone Mode.");
+            // This opens it in a way that respects your PWA standalone scope
+            window.open(url, '_blank'); 
+        } else {
+            document.getElementById('surfFrame').src = url;
         }
+        playSnd('click');
+    }
+        }
+        
         
         window.oncontextmenu = function(e) { e.preventDefault(); const m=document.getElementById('ctx-menu'); m.style.display='flex'; m.style.left=(mouseEnabled?cursorX:e.clientX)+'px'; m.style.top=(mouseEnabled?cursorY:e.clientY)+'px'; };
         window.onclick = function(e) { 
